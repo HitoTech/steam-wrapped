@@ -1,0 +1,26 @@
+[project]
+name = "steam-wrapped"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "Mickael Bellenger", email = "mickael.bellenger@gmail.com"}
+]
+dependencies = [
+    "requests>=2.32.4",
+    "python-dotenv>=1.1.1",
+    "rich>=14.1.0",
+    "httpx>=0.28.1",
+]
+requires-python = ">=3.13"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[project.optional-dependencies]
+dev = [
+    "black>=25.1.0",
+    "isort>=6.0.1",
+    "ruff>=0.12.5",
+]
+[tool.pdm]
+distribution = false
