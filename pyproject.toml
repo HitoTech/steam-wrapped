@@ -28,8 +28,9 @@ dev = [
 distribution = false
 
 [tool.pdm.scripts]
-lint = { cmd = "ruff . && black --check . && mypy ." }
-format = { cmd = "black . && ruff --fix ." }
+ruff = "ruff check . --fix"
+black = "black ."
+all.composite = ["ruff", "black"]
 
 [tool.black]
 line-length = 88
