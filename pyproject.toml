@@ -39,7 +39,9 @@ target-version = ["py311"]
 [tool.ruff]
 line-length = 88
 target-version = "py311"
-extend-select = ["I"]  # Active l'import sorting comme isort
+
+[tool.ruff.lint]
+extend-select = ["I"]
 
 [tool.mypy]
 python_version = "3.11"
