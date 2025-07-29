@@ -36,7 +36,7 @@ def add_background_image(games):
 def add_header(canvas):
     today = datetime.today()
     start = today - timedelta(days=14)
-    date_text = f"{format_date(start, format='dd/MM', locale='fr_FR')} - {format_date(today, format='dd/MM/yyyy', locale='fr_FR')}"
+    date_text = f"{format_date(start, format='dd MMMM', locale='fr_FR')} - {format_date(today, format='dd MMMM yyyy', locale='fr_FR')}"
 
     draw_text_with_blur_shadow(
         canvas, (MARGIN + 100, MARGIN), "Steam Wrapped", font_title
