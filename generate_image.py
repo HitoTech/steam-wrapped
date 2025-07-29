@@ -13,6 +13,12 @@ FONT_GAME = "fonts/Montserrat-Regular.ttf"
 font_title = ImageFont.truetype(FONT_TITLE, 80)
 font_game = ImageFont.truetype(FONT_GAME, 60)
 
+# Palette de couleurs Steam
+STEAM_BLUE = (0, 174, 239)
+STEAM_DARK = (23, 26, 33)
+STEAM_LIGHT = (42, 71, 94)
+ACCENT_COLOR = (255, 255, 255, 0.9)
+
 
 def download_image(appid: int, format: str) -> Image.Image:
     url = f"https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/{format}"
@@ -105,6 +111,24 @@ def add_played_games(canvas, draw, font_game, games):
         )
         border_width = 6
         border_color = "white"
+
+        # Create shadow for the game poster
+        shadow_offset = (8, 8)
+        shadow_blur_radius = 20
+
+        # Create shadow image
+        shadow_img = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+        shadow_x = MARGIN + shadow_offset[0]
+        shadow_y = y_offset + shadow_offset[1]
+        shadow_img.paste(game_img, (shadow_x, shadow_y))
+
+        # Apply blur to shadow
+        shadow_img = shadow_img.filter(
+            ImageFilter.GaussianBlur(radius=shadow_blur_radius)
+        )
+
+        # Composite shadow onto canvas
+        canvas.alpha_composite(shadow_img)
 
         # Draw a rectangle behind the game logo
         draw.rectangle(
