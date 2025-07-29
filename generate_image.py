@@ -117,14 +117,17 @@ def add_played_games(canvas, draw, font_game, games):
         )
         canvas.paste(game_img, (MARGIN, y_offset))
 
-        hours = round(game["playtime_2weeks"] / 60, 1)
+        hours = int(round(game["playtime_2weeks"] / 60, 1))
+        minutes = int((game["playtime_2weeks"] % 60))
+        game_time = f"{hours} h {minutes} min" if hours > 0 else f"{minutes} min"
+
         draw_text_with_blur_shadow(
             canvas,
             (MARGIN + 250, y_offset + 60),
-            f"{game['name']}\n{hours} h",
+            f"{game['name']}\n{game_time}",
             font=font_game,
         )
-        y_offset += 200
+        y_offset += 350
 
 
 def create_story_image(games: list[dict]):
