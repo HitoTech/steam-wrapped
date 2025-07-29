@@ -13,12 +13,6 @@ FONT_GAME = "fonts/Montserrat-Regular.ttf"
 font_title = ImageFont.truetype(FONT_TITLE, 80)
 font_game = ImageFont.truetype(FONT_GAME, 60)
 
-# Palette de couleurs Steam
-STEAM_BLUE = (0, 174, 239)
-STEAM_DARK = (23, 26, 33)
-STEAM_LIGHT = (42, 71, 94)
-ACCENT_COLOR = (255, 255, 255, 0.9)
-
 
 def download_image(appid: int, format: str) -> Image.Image:
     url = f"https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/{format}"
@@ -43,6 +37,15 @@ def add_header(canvas):
     today = datetime.today()
     start = today - timedelta(days=14)
     date_text = f"{format_date(start, format='dd MMMM', locale='fr_FR')} - {format_date(today, format='dd MMMM yyyy', locale='fr_FR')}"
+
+    banner_height = 220
+    banner_rect = [(0, 0), (WIDTH, MARGIN + banner_height)]
+
+    # Créer un rectangle semi-transparent noir
+    overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+    overlay_draw = ImageDraw.Draw(overlay)
+    overlay_draw.rectangle(banner_rect, fill=(0, 0, 0, 120))  # Noir avec transparence
+    canvas.alpha_composite(overlay)
 
     draw_text_with_blur_shadow(
         canvas, (MARGIN + 100, MARGIN), "Steam Wrapped", font_title
@@ -102,7 +105,7 @@ def draw_text_with_blur_shadow(
 
 
 def add_played_games(canvas, draw, font_game, games):
-    y_offset = 300
+    y_offset = 350
     for game in games[:3]:
         if game["playtime_2weeks"] == 0:
             continue
