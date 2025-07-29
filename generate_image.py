@@ -112,10 +112,7 @@ def add_played_games(canvas, draw, font_game, games):
         game_img = download_image(game["appid"], "library_600x900.jpg").resize(
             (200, 300)
         )
-        border_width = 6
-        border_color = "white"
 
-        # Create shadow for the game poster
         shadow_offset = (8, 8)
         shadow_blur_radius = 20
 
@@ -132,16 +129,6 @@ def add_played_games(canvas, draw, font_game, games):
 
         # Composite shadow onto canvas
         canvas.alpha_composite(shadow_img)
-
-        # Draw a rectangle behind the game logo
-        draw.rectangle(
-            [
-                (MARGIN - border_width, y_offset - border_width),
-                (MARGIN + 200 + border_width, y_offset + 300 + border_width),
-            ],
-            outline=border_color,
-            width=border_width,
-        )
         canvas.paste(game_img, (MARGIN, y_offset))
 
         hours = int(round(game["playtime_2weeks"] / 60, 1))
