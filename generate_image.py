@@ -97,7 +97,7 @@ def draw_text_with_blur_shadow(
 
 def add_played_games(canvas, draw, font_game, games):
     y_offset = 300
-    for game in games:
+    for game in games[:3]:
         if game["playtime_2weeks"] == 0:
             continue
         game_img = download_image(game["appid"], "library_600x900.jpg").resize(
