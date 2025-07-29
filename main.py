@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from rich.console import Console
 from rich.table import Table
 
+from generate_image import create_story_image
+
 load_dotenv()
 
 STEAM_API_KEY = os.getenv("STEAM_API_KEY")
@@ -77,12 +79,14 @@ if __name__ == "__main__":
     if not STEAM_API_KEY or not STEAM_USER_ID:
         print("⚠️ STEAM_API_KEY ou STEAM_USER_ID manquant dans .env")
     else:
-        played_games = get_played_games(STEAM_USER_ID)
+        # played_games = get_played_games(STEAM_USER_ID)
         played_games_last_2_weeks = get_played_games_on_last_2_weeks(STEAM_USER_ID)
 
-        display_games_table("🎮 Tous les jeux joués", played_games)
-        display_games_table(
-            "🕒 Jeux joués les 2 dernières semaines",
-            played_games_last_2_weeks,
-            "playtime_2weeks",
-        )
+        # display_games_table("🎮 Tous les jeux joués", played_games)
+        # display_games_table(
+        #     "🕒 Jeux joués les 2 dernières semaines",
+        #     played_games_last_2_weeks,
+        #     "playtime_2weeks",
+        # )
+
+        create_story_image(played_games_last_2_weeks)
