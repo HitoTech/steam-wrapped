@@ -5,13 +5,13 @@ import requests
 from babel.dates import format_date
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-WIDTH, HEIGHT = 1080, 1920
-MARGIN = 60
-FONT_TITLE = "fonts/Montserrat-Bold.ttf"
-FONT_GAME = "fonts/Montserrat-Regular.ttf"
+from config import Config
 
-font_title = ImageFont.truetype(FONT_TITLE, 80)
-font_game = ImageFont.truetype(FONT_GAME, 60)
+WIDTH, HEIGHT = Config.IMAGE_WIDTH, Config.IMAGE_HEIGHT
+MARGIN = 60
+
+font_title = ImageFont.truetype(Config.FONT_TITLE, 80)
+font_game = ImageFont.truetype(Config.FONT_GAME, 60)
 
 
 def download_image(appid: int, format: str) -> Image.Image:
@@ -36,15 +36,15 @@ def add_background_image(games):
 def add_header(canvas):
     today = datetime.today()
     start = today - timedelta(days=14)
-    date_text = f"{format_date(start, format='dd MMMM', locale='fr_FR')} - {format_date(today, format='dd MMMM yyyy', locale='fr_FR')}"
+    date_text = f"{format_date(start, format='dd MMMM', locale=Config.LOCALE)} - {format_date(today, format='dd MMMM yyyy', locale=Config.LOCALE)}"
 
     banner_height = 220
     banner_rect = [(0, 0), (WIDTH, MARGIN + banner_height)]
 
-    # Créer un rectangle semi-transparent noir
+    # Create a semi-transparent black rectangle
     overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
     overlay_draw = ImageDraw.Draw(overlay)
-    overlay_draw.rectangle(banner_rect, fill=(0, 0, 0, 120))  # Noir avec transparence
+    overlay_draw.rectangle(banner_rect, fill=(0, 0, 0, 120))  # Black with transparency
     canvas.alpha_composite(overlay)
 
     draw_text_with_blur_shadow(
@@ -84,22 +84,22 @@ def draw_text_with_blur_shadow(
     offset=(4, 4),
     blur_radius=4,
 ):
-    # Créer une image temporaire pour l'ombre
+    # Create a temporary image for the shadow
     txt_img = Image.new("RGBA", base_img.size, (0, 0, 0, 0))
     txt_draw = ImageDraw.Draw(txt_img)
 
-    # Position de l'ombre
+    # Shadow position
     x, y = position
     shadow_pos = (x + offset[0], y + offset[1])
 
-    # Dessine l’ombre
+    # Draw the shadow
     txt_draw.text(shadow_pos, text, font=font, fill=shadow_color)
     txt_img = txt_img.filter(ImageFilter.GaussianBlur(radius=blur_radius))
 
-    # Combine l'ombre floutée avec l'image de base
+    # Combine the blurred shadow with the base image
     base_img.alpha_composite(txt_img)
 
-    # Dessine le texte principal par-dessus
+    # Draw the main text on top
     draw = ImageDraw.Draw(base_img)
     draw.text(position, text, font=font, fill=text_color)
 
