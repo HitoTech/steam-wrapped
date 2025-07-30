@@ -106,6 +106,10 @@ def draw_text_with_blur_shadow(
 
 def add_played_games(canvas, draw, font_game, games):
     y_offset = 350
+
+    # Créer une police plus petite pour le temps de jeu
+    font_time = ImageFont.truetype(Config.FONT_GAME, 45)
+
     for game in games[:3]:
         if game["playtime_2weeks"] == 0:
             continue
@@ -131,16 +135,51 @@ def add_played_games(canvas, draw, font_game, games):
         canvas.alpha_composite(shadow_img)
         canvas.paste(game_img, (MARGIN, y_offset))
 
-        hours = int(round(game["playtime_2weeks"] / 60, 1))
-        minutes = int((game["playtime_2weeks"] % 60))
-        game_time = f"{hours} h {minutes} min" if hours > 0 else f"{minutes} min"
+        # Gestion intelligente du nom du jeu (troncature si trop long)
+        game_name = game["name"]
+        max_chars = 35  # Limite de caractères pour éviter le débordement
+        if len(game_name) > max_chars:
+            game_name = game_name[: max_chars - 3] + "..."
 
+            # Formatage du temps simplifié
+        total_minutes = game["playtime_2weeks"]
+        hours = total_minutes // 60
+        minutes = total_minutes % 60
+
+        if hours > 0:
+            game_time = f"{hours}h {minutes}min"
+        else:
+            game_time = f"{minutes}min"
+
+        # Position du texte avec meilleur espacement
+        text_x = MARGIN + 250
+        name_y = y_offset + 40
+        time_y = y_offset + 110
+
+        # Afficher le nom du jeu avec une ombre plus prononcée
         draw_text_with_blur_shadow(
             canvas,
-            (MARGIN + 250, y_offset + 60),
-            f"{game['name']}\n{game_time}",
+            (text_x, name_y),
+            game_name,
             font=font_game,
+            text_color="white",
+            shadow_color="black",
+            offset=(3, 3),
+            blur_radius=6,
         )
+
+        # Afficher le temps de jeu avec une couleur légèrement différente
+        draw_text_with_blur_shadow(
+            canvas,
+            (text_x, time_y),
+            game_time,
+            font=font_time,
+            text_color="#E0E0E0",  # Gris clair pour différencier du nom
+            shadow_color="black",
+            offset=(2, 2),
+            blur_radius=4,
+        )
+
         y_offset += 350
 
 
