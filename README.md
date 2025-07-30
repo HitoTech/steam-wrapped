@@ -28,10 +28,9 @@ Generate beautiful visual summaries of your Steam gaming activity, similar to Sp
 
 ## 📚 Documentation
 
-- **[🏗️ Architecture](docs/ARCHITECTURE.md)** - Project structure and design
+- **[⚙️ Configuration](docs/ENV_SETUP.md)** - Environment setup guide
 - **[🔧 API Reference](docs/API.md)** - Services and models documentation
 - **[👩‍💻 Development](docs/DEVELOPMENT.md)** - Setup, workflow, and contributing
-- **[⚙️ Configuration](docs/ENV_SETUP.md)** - Environment setup guide
 
 ## 🤝 Contributing
 
