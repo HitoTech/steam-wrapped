@@ -104,7 +104,7 @@ def draw_text_with_blur_shadow(
     draw.text(position, text, font=font, fill=text_color)
 
 
-def add_played_games(canvas, draw, font_game, games):
+def add_played_games(canvas, font_game, games):
     y_offset = 350
 
     # Créer une police plus petite pour le temps de jeu
@@ -186,7 +186,7 @@ def add_played_games(canvas, draw, font_game, games):
 def create_story_image(games: list[dict]):
     canvas, draw = add_background_image(games)
     add_header(canvas)
-    add_played_games(canvas, draw, font_game, games)
+    add_played_games(canvas, font_game, games)
     canvas = add_background_gradient(canvas)
     canvas = add_steam_logo(canvas)
 
