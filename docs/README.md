@@ -17,7 +17,7 @@ Welcome to the Steam Wrapped documentation! This folder contains comprehensive t
 
 ### For Users
 
-- **[⚙️ Configuration Guide](../ENV_SETUP.md)**
+- **[⚙️ Configuration Guide](../docs/ENV_SETUP.md)**
   Step-by-step setup instructions for Steam API credentials
 
 - **[📖 Main README](../README.md)**

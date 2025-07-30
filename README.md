@@ -13,7 +13,7 @@ Generate beautiful visual summaries of your Steam gaming activity, similar to Sp
 
 ## 🚀 Quick Start
 
-1. **Get Steam credentials** ([detailed guide](ENV_SETUP.md)):
+1. **Get Steam credentials** ([detailed guide](docs/ENV_SETUP.md)):
    - Steam Web API key from [here](https://steamcommunity.com/dev/apikey)
    - Your Steam User ID from your profile URL
 
@@ -31,7 +31,7 @@ Generate beautiful visual summaries of your Steam gaming activity, similar to Sp
 - **[🏗️ Architecture](docs/ARCHITECTURE.md)** - Project structure and design
 - **[🔧 API Reference](docs/API.md)** - Services and models documentation
 - **[👩‍💻 Development](docs/DEVELOPMENT.md)** - Setup, workflow, and contributing
-- **[⚙️ Configuration](ENV_SETUP.md)** - Environment setup guide
+- **[⚙️ Configuration](docs/ENV_SETUP.md)** - Environment setup guide
 
 ## 🤝 Contributing
 
