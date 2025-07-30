@@ -2,7 +2,7 @@
 
 Generate beautiful visual summaries of your Steam gaming activity, similar to Spotify Wrapped.
 
-![Steam Wrapped Example](steam_story.png)
+<img src="steam_story.png" alt="Steam Wrapped Example" width="300">
 
 ## ✨ Features
 
