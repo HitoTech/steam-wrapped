@@ -1,11 +1,19 @@
 """Configuration module using environment variables for security."""
 
+import logging
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
+
+
+class ConfigError(Exception):
+    """Exception raised for configuration errors."""
+
+    pass
 
 
 class Config:
@@ -38,13 +46,36 @@ class Config:
             missing_vars.append("STEAM_USER_ID")
 
         if missing_vars:
-            raise ValueError(
+            raise ConfigError(
                 f"Missing required environment variables: {', '.join(missing_vars)}\n"
                 f"Please check your .env file or environment variables."
             )
 
         return True
 
+    @classmethod
+    def validate_fonts(cls) -> bool:
+        """Validate that font files exist."""
+        missing_fonts = []
 
-# Validate configuration on import
-Config.validate()
+        if not Path(cls.FONT_TITLE).exists():
+            missing_fonts.append(cls.FONT_TITLE)
+        if not Path(cls.FONT_GAME).exists():
+            missing_fonts.append(cls.FONT_GAME)
+
+        if missing_fonts:
+            raise ConfigError(
+                f"Missing font files: {', '.join(missing_fonts)}\n"
+                f"Please ensure font files are in the fonts/ directory."
+            )
+
+        return True
+
+    @classmethod
+    def setup_logging(cls) -> None:
+        """Setup logging configuration."""
+        logging.basicConfig(
+            level=getattr(logging, cls.LOG_LEVEL.upper(), logging.INFO),
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )

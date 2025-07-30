@@ -1,84 +1,71 @@
-import os
+"""Steam Wrapped - Main application entry point."""
 
-import httpx
-from dotenv import load_dotenv
-from rich.console import Console
-from rich.table import Table
+import logging
+import sys
 
-from generate_image import create_story_image
-
-load_dotenv()
-
-STEAM_API_KEY = os.getenv("STEAM_API_KEY")
-STEAM_USER_ID = os.getenv("STEAM_USER_ID")
-
-console = Console()
+from config import Config, ConfigError
+from src.services.image_service import ImageGenerationError, create_image_service
+from src.services.steam_api import SteamAPIError, create_steam_service
+from src.ui.display import create_display_service
 
 
-def display_games_table(title: str, games: list, time_key: str = "playtime_forever"):
-    table = Table(title=title)
+def main() -> None:
+    """Main application entry point."""
+    # Setup logging
+    Config.setup_logging()
+    logger = logging.getLogger(__name__)
 
-    table.add_column("Nom", style="cyan", no_wrap=True)
-    table.add_column("Temps de jeu", justify="right", style="green")
+    # Create services
+    display = create_display_service()
 
-    for game in games:
-        minutes = game.get(time_key, 0)
-        hours = minutes // 60
-        mins = minutes % 60
-        table.add_row(game["name"], f"{hours} h {mins:02d} min")
+    try:
+        # Validate configuration
+        Config.validate()
+        Config.validate_fonts()
 
-    console.print(table)
+        logger.info("Starting Steam Wrapped application")
 
+        # Create Steam API service
+        with create_steam_service() as steam_api:
+            # Fetch recent games
+            logger.info(f"Fetching recent games for user {Config.STEAM_USER_ID}")
+            recent_games = steam_api.get_recently_played_games(Config.STEAM_USER_ID)
 
-def get_player_summaries(steamid: str):
-    url = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/"
-    params = {"key": STEAM_API_KEY, "steamids": steamid}
-    response = httpx.get(url, params=params)
-    response.raise_for_status()
-    return response.json()
+            if not recent_games:
+                display.display_error("Aucun jeu joué dans les 2 dernières semaines.")
+                return
 
+            # Display summary
+            display.display_summary(recent_games)
 
-def get_owned_games(
-    steamid: str, include_free: bool = False, include_appinfo: bool = True
-):
-    url = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/"
-    params = {
-        "key": STEAM_API_KEY,
-        "steamid": steamid,
-        "include_played_free_games": str(include_free).lower(),
-        "include_appinfo": str(include_appinfo).lower(),
-    }
-    response = httpx.get(url, params=params)
-    response.raise_for_status()
-    return response.json()["response"].get("games", [])
+            # Display games table (optional)
+            display.display_games_table(
+                "Jeux récents (2 dernières semaines)",
+                recent_games[:10],
+                "playtime_2weeks",
+            )
 
+            # Generate image
+            logger.info("Generating Steam story image")
+            image_service = create_image_service()
+            output_path = image_service.create_story_image(recent_games)
 
-def get_played_games(
-    steamid: str, include_free: bool = False, include_appinfo: bool = True
-):
-    all_games = get_owned_games(steamid, include_free, include_appinfo)
+            display.display_success(f"Image générée avec succès: {output_path}")
 
-    played_games = [game for game in all_games if game.get("playtime_forever", 0) > 0]
-    played_games.sort(key=lambda g: g["playtime_forever"], reverse=True)
-
-    return played_games
-
-
-def get_played_games_on_last_2_weeks(
-    steamid: str, include_free: bool = False, include_appinfo: bool = True
-):
-    all_games = get_owned_games(steamid, include_free, include_appinfo)
-
-    played_games = [game for game in all_games if game.get("playtime_2weeks", 0) > 0]
-    played_games.sort(key=lambda g: g["playtime_2weeks"], reverse=True)
-
-    return played_games
+    except ConfigError as e:
+        display.display_error(f"Configuration invalide: {e}")
+        sys.exit(1)
+    except SteamAPIError as e:
+        display.display_error(f"Erreur API Steam: {e}")
+        sys.exit(1)
+    except ImageGenerationError as e:
+        display.display_error(f"Erreur génération d'image: {e}")
+        sys.exit(1)
+    except Exception as e:
+        logger.exception("Unexpected error occurred")
+        display.display_error(f"Erreur inattendue: {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
-    if not STEAM_API_KEY or not STEAM_USER_ID:
-        print("⚠️ STEAM_API_KEY ou STEAM_USER_ID manquant dans .env")
-    else:
-        played_games_last_2_weeks = get_played_games_on_last_2_weeks(STEAM_USER_ID)
-
-        create_story_image(played_games_last_2_weeks)
+    main()
