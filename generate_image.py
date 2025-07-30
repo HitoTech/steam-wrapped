@@ -104,11 +104,71 @@ def draw_text_with_blur_shadow(
     draw.text(position, text, font=font, fill=text_color)
 
 
+def draw_rounded_rectangle(draw, bbox, radius, fill_color):
+    """Draw a rectangle with rounded corners"""
+    x1, y1, x2, y2 = bbox
+
+    # Main rectangle
+    draw.rectangle([x1 + radius, y1, x2 - radius, y2], fill=fill_color)
+    draw.rectangle([x1, y1 + radius, x2, y2 - radius], fill=fill_color)
+
+    # Rounded corners
+    draw.pieslice([x1, y1, x1 + 2 * radius, y1 + 2 * radius], 180, 270, fill=fill_color)
+    draw.pieslice([x2 - 2 * radius, y1, x2, y1 + 2 * radius], 270, 360, fill=fill_color)
+    draw.pieslice([x1, y2 - 2 * radius, x1 + 2 * radius, y2], 90, 180, fill=fill_color)
+    draw.pieslice([x2 - 2 * radius, y2 - 2 * radius, x2, y2], 0, 90, fill=fill_color)
+
+
+def draw_time_badge(canvas, position, time_text, font):
+    """Draw playtime in a badge/pill shape"""
+    x, y = position
+
+    # Create temporary image to measure text
+    temp_img = Image.new("RGBA", (1, 1))
+    temp_draw = ImageDraw.Draw(temp_img)
+    text_bbox = temp_draw.textbbox((0, 0), time_text, font=font)
+    text_width = text_bbox[2] - text_bbox[0]
+    text_height = text_bbox[3] - text_bbox[1]
+
+    # Badge dimensions with padding
+    padding_x = padding_y = 20
+    badge_width = text_width + 2 * padding_x
+    badge_height = text_height + 2 * padding_y
+
+    # Badge position
+    badge_x1 = x
+    badge_y1 = y
+    badge_x2 = x + badge_width
+    badge_y2 = y + badge_height
+
+    # Create overlay for badge with transparency
+    overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+    overlay_draw = ImageDraw.Draw(overlay)
+
+    # Draw badge with rounded corners
+    radius = 20
+    badge_color = (0, 0, 0, 110)  # Semi-transparent black
+    draw_rounded_rectangle(
+        overlay_draw, (badge_x1, badge_y1, badge_x2, badge_y2), radius, badge_color
+    )
+
+    # Apply overlay to canvas
+    canvas.alpha_composite(overlay)
+
+    # Text position centered in badge
+    text_x = x + padding_x
+    text_y = y + padding_y - 10
+
+    # Draw text
+    draw = ImageDraw.Draw(canvas)
+    draw.text((text_x, text_y), time_text, font=font, fill="white")
+
+
 def add_played_games(canvas, font_game, games):
     y_offset = 350
 
-    # Créer une police plus petite pour le temps de jeu
-    font_time = ImageFont.truetype(Config.FONT_GAME, 45)
+    # Create smaller font for playtime
+    font_time = ImageFont.truetype(Config.FONT_GAME, 40)
 
     for game in games[:3]:
         if game["playtime_2weeks"] == 0:
@@ -135,13 +195,13 @@ def add_played_games(canvas, font_game, games):
         canvas.alpha_composite(shadow_img)
         canvas.paste(game_img, (MARGIN, y_offset))
 
-        # Gestion intelligente du nom du jeu (troncature si trop long)
+        # Smart game name handling (truncate if too long)
         game_name = game["name"]
-        max_chars = 35  # Limite de caractères pour éviter le débordement
+        max_chars = 35  # Character limit to avoid overflow
         if len(game_name) > max_chars:
             game_name = game_name[: max_chars - 3] + "..."
 
-            # Formatage du temps simplifié
+        # Simplified time formatting
         total_minutes = game["playtime_2weeks"]
         hours = total_minutes // 60
         minutes = total_minutes % 60
@@ -151,12 +211,12 @@ def add_played_games(canvas, font_game, games):
         else:
             game_time = f"{minutes}min"
 
-        # Position du texte avec meilleur espacement
+        # Text position with better spacing
         text_x = MARGIN + 250
         name_y = y_offset + 40
-        time_y = y_offset + 110
+        time_y = y_offset + 120
 
-        # Afficher le nom du jeu avec une ombre plus prononcée
+        # Display game name with pronounced shadow
         draw_text_with_blur_shadow(
             canvas,
             (text_x, name_y),
@@ -168,17 +228,8 @@ def add_played_games(canvas, font_game, games):
             blur_radius=6,
         )
 
-        # Afficher le temps de jeu avec une couleur légèrement différente
-        draw_text_with_blur_shadow(
-            canvas,
-            (text_x, time_y),
-            game_time,
-            font=font_time,
-            text_color="#E0E0E0",  # Gris clair pour différencier du nom
-            shadow_color="black",
-            offset=(2, 2),
-            blur_radius=4,
-        )
+        # Display playtime in a badge
+        draw_time_badge(canvas, (text_x, time_y), game_time, font_time)
 
         y_offset += 350
 
