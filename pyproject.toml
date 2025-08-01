@@ -37,7 +37,7 @@ ruff = "ruff check . --fix"
 black = "black ."
 test = "pytest tests/ -v"
 test-cov = "pytest tests/ --cov=src --cov-report=html --cov-report=term-missing"
-all.composite = ["ruff", "black"]
+linters.composite = ["ruff", "black"]
 
 [tool.black]
 line-length = 88
