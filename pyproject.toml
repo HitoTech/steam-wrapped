@@ -24,6 +24,10 @@ dev = [
     "isort>=6.0.1",
     "ruff>=0.12.5",
     "pre-commit>=4.2.0",
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+    "pytest-mock>=3.12.0",
+    "httpx>=0.28.1",
 ]
 [tool.pdm]
 distribution = false
@@ -31,6 +35,8 @@ distribution = false
 [tool.pdm.scripts]
 ruff = "ruff check . --fix"
 black = "black ."
+test = "pytest tests/ -v"
+test-cov = "pytest tests/ --cov=src --cov-report=html --cov-report=term-missing"
 all.composite = ["ruff", "black"]
 
 [tool.black]
@@ -48,5 +54,23 @@ extend-select = ["I"]
 python_version = "3.11"
 strict = true
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "slow: Slow running tests",
+]
 
 
