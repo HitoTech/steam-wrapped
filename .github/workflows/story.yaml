@@ -1,0 +1,42 @@
+name: Steam Wrapped Biweekly
+
+on:
+  schedule:
+    - cron: '0 8 */14 * *'  # Tous les 14 jours à 08:00 UTC
+  workflow_dispatch:        # Permet aussi de lancer manuellement si besoin
+
+jobs:
+  generate_story:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install PDM
+        run: pip install pdm
+
+      - name: Configure PDM
+        run: pdm config python.use_venv true
+
+      - name: Install dependencies
+        run: pdm install
+
+      - name: Set up .env
+        run: |
+          echo "STEAM_API_KEY=${{ secrets.STEAM_API_KEY }}" >> .env
+          echo "STEAM_USER_ID=${{ secrets.STEAM_USER_ID }}" >> .env
+
+      - name: Run script to generate image
+        run: pdm run python main.py
+
+      - name: Upload image as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: steam-story-image
+          path: steam_story.png
