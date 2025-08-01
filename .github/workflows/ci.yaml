@@ -30,7 +30,7 @@ jobs:
               run: pdm install
 
             - name: Run linters
-              run: pdm run all.composite
+              run: pdm run all
 
             - name: Run tests
               run: pdm run pytest
